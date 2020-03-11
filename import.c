@@ -4,6 +4,7 @@
 
 void main()
 {
+
 /* This .tiff file is essentially a stack of 2D images - this code tells us how many images
  * are in the stack.
  */
