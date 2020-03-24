@@ -2,6 +2,25 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+void printArray(char * array, uint32 width);
+
+void readHeader()
+{
+    // Read header of tiff file
+    FILE *fp;
+    unsigned char buffer[40];
+    int i;
+    char c;
+    fp = fopen("img100_1.tif", "rb");
+    fseek(fp, 0, SEEK_SET);
+    for (i = 0; i < 40; i++) {
+       c = fgetc(fp);
+       buffer[i] = c;
+       printf("Byte %d: %X\n", i, c);
+    }
+    fclose(fp);
+}
+
 void main()
 {
 
@@ -13,6 +32,8 @@ void main()
 	int dircount = 0;
 	do {
 	    dircount++;
+//          Enable line below to see directory info - very useful
+//          TIFFPrintDirectory(tif, stdout, 0);
 	} while (TIFFReadDirectory(tif));
 	printf("%d directories in %s\n", dircount, "img100_1");
     }
@@ -20,23 +41,50 @@ void main()
     if (tif) {
 	uint32 w, h;
 	size_t npixels;
-	uint32* raster;
+	char *buf = malloc(16 * 512); // One strip has 16 rows of 512
+	uint32 row;
+	uint32 config;
 
 	TIFFGetField(tif, TIFFTAG_IMAGEWIDTH, &w);
 	TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &h);
+        TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
         printf("TIFF width: %d\n", w);
         printf("TIFF height: %d\n", h);
+        printf("TIFF config: %d\n", config);
 	npixels = w * h;
-	raster = (uint32*) _TIFFmalloc(npixels * sizeof (uint32));
-	if (raster != NULL) {
-	    if (TIFFReadRGBAImage(tif, w, h, raster, 0)) {
-                // manipulate raster data here
-	    }
-	    _TIFFfree(raster);
-	}
+	
+        int curDirectory = -1;
+        TIFFSetDirectory(tif, 0);
+        curDirectory = TIFFCurrentDirectory(tif);
+        printf("Current Directory: %d\n", curDirectory);
+        
+        // Read first strip of data
+        int ret = TIFFReadEncodedStrip(tif, 0, buf, 16 * 512);
+        printf("returned: %d\n", ret);
+        printArray(buf, 1000);
+        
+	
+        free(buf);
+        TIFFClose(tif);
+    }
+    exit(0);
+}
+
+void printArray(char * array, uint32 width)
+{
+    uint32 i;
+    /*
+    for (i = 0; i < width; i++)
+    {
+        printf("%d ", array[i] + 128);
+        if (i % 10 == 0)
+            printf("\n"); 
+    }
+    printf("\n");
+    */
+    
+    for (i = 0; i < 16; i++) {
+        printf("%d\n", array[i*512 + 200] + 128);
     }
 
-
-    TIFFClose(tif);
-    exit(0);
 }
