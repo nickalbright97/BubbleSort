@@ -1,0 +1,211 @@
+;+
+;
+;NAME:
+;      efeaturenew_V2
+;
+;PURPOSE:
+;
+;      This function finds and measures spherical features in
+;      a 3d image stack of closed packed spheres. Although
+;      developed independently, it closely follows the procedure
+;      outlined at R.Penfold, A.D.Watson, A.R.Mackie, and
+;      D.J. Hibberd, Langmuir 22, 2005-2015 (2006)
+;
+;CATEGORY:
+;      Image processing
+;
+;CALLING SEQUENCE:
+;      result = efeaturenew(image [,minr = minr, padsize = padsize,
+;                        threshold = threshold] )
+;
+;INPUTS:
+;      image: A 3d image stack. Spheroids to be found should look dark
+;             in a clear background.
+;      minr:  Radius of the smallest feature to be found in pixels. Default value
+;             is 5. There is a limit to this number: rule of thumb is it
+;             should not be smaller than the 2x the resolution of your
+;             optical device.However, be aware that no matter how good the
+;             resolution, the function will not perform well for
+;             features smaller than 5 pixels in *diameter*.
+;      padsize: Typically the radius of the largest feature to be
+;             found. Default value is 50.
+;      threshold: Level at which a binary version of the image best
+;             captures spheroids of all size ranges. Default value is 120.
+;
+;OUTPUT:
+;      Array with xyz positions and radii of the features found. Columns 0
+;      to 2 contains the x,y,z centroid positions and column 3
+;      contains the radii.
+;
+;SIDE EFFECTS:
+;      None.
+;
+;REQUIRES:
+;      Array_indices.pro
+;
+;RESTRICTIONS:
+;      To work properly, the images must consist of dark spheres in a
+;      bright background. It is a good idea to pre-process  the image
+;      stack before running eFeature on it. In
+;      practice low frequency gradients in brightness, as well as high frequency
+;      noise need to be minimized by some suitable filter. In
+;      adition, dust specks should be subtracted, brightness gradients
+;      in any direction must be minimized. Finally, since the function
+;      looks for spherical particles, the pixel scale must be isotropic.
+;      The function process_cube that acompany this release performs
+;      most of the above mentioned pre-processing tasks and forms a
+;      nice complement to this function.
+;
+;HISTORY:
+;      Written by:
+;           K. Feitosa, Univ. of Penn, Nov. 2008
+;      Introduced function BinSphere for faster processing speed
+;      Added selection of correct local maxima
+;           K. Feitosa, Univ. of Penn,  Feb. 2009
+;      Fixed bugs, improved efficiency
+;         K. Feitosa, JMU Nov. 2013
+;
+;
+;-
+
+
+function BinSphere,ext
+;This fucntion was inspired by the function lrsqd3d
+;created by John C. Crocker. It creates a binary sphere of diameter
+;ext where points inside the sphere are 1 and outside are 0.
+
+    x = ext
+    r2 = fltarr(x,x,x,/nozero)
+    xc = float(x-1) / 2.
+    xi = fltarr(x) +1
+    xa = (findgen(x) - xc)
+    xa = xa^2
+
+    for k=0,x-1 do begin
+        r2(*,*,k) = (xi ## xa) + (xa ## xi) + xa(k)
+    endfor
+
+    return, r2 le (float(x-1)/2)^2 + float((x-1) mod 2)*0.5
+
+end
+
+
+;-----------
+;
+;Main body
+;
+;------------
+function efeaturenew_v2,image,minr=minr,padsize=padsize,threshold=threshold
+
+   cdim = size(image)
+
+   if keyword_set(minr) then minr = minr else minr = 5
+   if keyword_set(padsize) then xo = padsize else xo = 100
+   if keyword_set(threshold) then t_level = threshold else t_level = 120
+
+;gen a padded cube. This is needed to correctly perform the
+;morphological operations
+   yo = xo
+   zo = xo
+   pad = bytarr(cdim[1]+2*xo,cdim[2]+2*yo,cdim[3]+2*zo)  ;original dimensions plus two times the largest droplet diameter.
+   pad = pad*0 ;set all elements equal to 1
+   pad[xo,yo,zo] = image
+   pad = morph_distance(pad lt t_level,neighbor_sampling = 3)
+
+;initialize list
+   xyzr = intarr(4,1)
+
+
+;---
+;
+;find features
+;
+;---
+   i = 0L
+   mx = max(pad[xo:xo+cdim[1]-1,xo:xo+cdim[2]-1,xo:xo+cdim[3]-1])
+   temp_r = round(mx)+1 ; initialize radius
+
+   while (mx ge minr) do begin
+
+       mx = max(pad[xo:xo+cdim[1]-1,xo:xo+cdim[2]-1,xo:xo+cdim[3]-1],loc) ; find maxima (inside main image)
+       print, mx
+
+   ;calculate the center of mass of centroid
+       w1 = where(pad[xo:xo+cdim[1]-1,xo:xo+cdim[2]-1,xo:xo+cdim[3]-1] eq mx,count) ;other voxels with identical maximum value?-1
+       if count gt 1 then begin
+        lcoor = array_indices(image,w1)
+        mcoor = array_indices(image,loc)
+        d = distance(mcoor,lcoor)
+        w2 = where(d lt mx/2)
+        coor = [mean(lcoor[0,w2]),mean(lcoor[1,w2]),mean(lcoor[2,w2])] ;mean location of the peak for truncated peaks of spheres
+        xyzr=[[xyzr],[coor[0],coor[1],coor[2],mx]] ; save position and radius
+        coor = round(coor) ; use integer to locate the centroid rather than float
+       endif else begin
+        coor=array_indices(image,loc) ;get coordinates of maxima
+    xyzr=[[xyzr],[coor[0],coor[1],coor[2],mx]] ; save position and radius
+   endelse
+
+
+       r = floor(mx)
+       if temp_r gt r then blank = 1b - BinSphere(2*r+1) ; create blank sphere with radius r for new radius
+       vol = pad[xo+coor[0]-r:xo+coor[0]+r,$
+                 yo+coor[1]-r:yo+coor[1]+r,$
+                 zo+coor[2]-r:zo+coor[2]+r] * blank
+       pad[xo+coor[0]-r,yo+coor[1]-r,zo+coor[2]-r] = vol ;blank volume sorrounding maxima
+       temp_r = r ; update radius
+       i = i + 1
+       ;print, i
+
+   endwhile
+
+   list=xyzr[*,1:*]    ; discard list's first element
+
+;---
+;
+;filter out false local maxima
+;
+;---
+
+   filter = bytarr(n_elements(list[0,*])) + 1
+
+;reload padded cube with original image
+   pad = pad*0
+   pad[xo,yo,zo] = image
+   pad = morph_distance(pad lt t_level,neighbor_sampling = 3)
+   ;zero padded area
+   pad[0:xo-1,*,*] = pad[0:xo-1,*,*]*0
+   pad[*,0:yo-1,*] = pad[*,0:yo-1,*]*0
+   pad[*,*,0:zo-1] = pad[*,*,0:zo-1]*0
+   pad[xo+cdim[1]:*,*,*] = pad[xo+cdim[1]:*,*,*]*0
+   pad[*,yo+cdim[2]:*,*] = pad[*,yo+cdim[2]:*,*]*0
+   pad[*,*,zo+cdim[3]:*] = pad[*,*,zo+cdim[3]:*]*0
+
+   templist = round(list) ;round values for list
+
+;filter false local maxima if k=1
+k=1
+if k eq 1 then begin
+
+   r = minr
+   blank = BinSphere(2*r+1) ;create a blank sphere
+   for i = 0L, n_elements(list[0,*])-1 do begin
+
+
+       vol = pad[xo+templist[0,i]-r:xo+templist[0,i]+r,$
+                 yo+templist[1,i]-r:yo+templist[1,i]+r,$
+                 zo+templist[2,i]-r:zo+templist[2,i]+r] * blank ;blank everything outside the sphere
+
+       p = max(vol,loc)
+       coor = array_indices(vol,loc)
+       if p gt list[3,i] then filter[i] = 0 ;true maxima? if not discard
+
+   endfor
+
+   nz = where(filter gt 0)
+   list = list[*,nz]
+endif
+
+  help, list
+    return, list
+
+end
