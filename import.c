@@ -41,7 +41,7 @@ void main()
     if (tif) {
 	uint32 w, h;
 	size_t npixels;
-	char *buf = malloc(16 * 512); // One strip has 16 rows of 512
+	unsigned char *buf = malloc(16 * 512 * 32); // One strip has 16 rows of 512
 	uint32 row;
 	uint32 config;
 
@@ -58,10 +58,12 @@ void main()
         curDirectory = TIFFCurrentDirectory(tif);
         printf("Current Directory: %d\n", curDirectory);
         
-        // Read first strip of data
-        int ret = TIFFReadEncodedStrip(tif, 0, buf, 16 * 512);
-        printf("returned: %d\n", ret);
-        printArray(buf, 1000);
+        // Read directory 0
+	for (int i = 0; i < 32; i++) { // 32 strips in slice
+            TIFFReadEncodedStrip(tif, i, &buf[512 * 16 * i], 16 * 512);
+        }
+        printf("Current Directory: %d\n", curDirectory);
+        printArray(buf, 512 * 16 * 32);
         
 	
         free(buf);
@@ -73,18 +75,21 @@ void main()
 void printArray(char * array, uint32 width)
 {
     uint32 i;
-    /*
+    
     for (i = 0; i < width; i++)
     {
         printf("%d ", array[i] + 128);
-        if (i % 10 == 0)
+        if (i % 512 == 0)
+            printf("End of row %d", i / 512 - 1);
+        if (i % 16 == 0)
             printf("\n"); 
     }
     printf("\n");
-    */
     
-    for (i = 0; i < 16; i++) {
-        printf("%d\n", array[i*512 + 200] + 128);
+    /*  Use this to print a column of values (offset is added to array index)
+    for (i = 0; i < 16 * 32; i++) {
+        printf("%d\n", array[i*512 + 250] + 128);
     }
+    */
 
 }
