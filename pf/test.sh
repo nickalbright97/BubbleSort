@@ -6,11 +6,11 @@
 
 make
 
-echo "512x512 SERIAL:"
-./pf
+./pf_serial
 
-echo "512x512 PARALLEL"
 OMP_NUM_THREADS=2  ./pf
 OMP_NUM_THREADS=4  ./pf
 OMP_NUM_THREADS=8  ./pf
 OMP_NUM_THREADS=16 ./pf
+OMP_NUM_THREADS=32 ./pf
+OMP_NUM_THREADS=64 ./pf

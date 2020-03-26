@@ -6,10 +6,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#ifdef _OPENMP
-#include <omp.h>
-#endif
-
 // Custom timing macros
 #include "timer.h"
 
@@ -36,13 +32,13 @@ void rand_gscales()
 {
     for (int x = 0; x < SIZE; x++)
     {
-	for (int y = 0; y < SIZE; y++)
+     	for (int y = 0; y < SIZE; y++)
         {
-	    for (int z = 0; z < SIZE; z++)
-       	    {
-   		int r = rand() % GMAX; // Random int 0-2 (inclusive)
-	        gscales[x][y][z] = r;  // Assign random int to gscale index
-	    }
+            for (int z = 0; z < SIZE; z++)
+            {
+             	int r = rand() % GMAX; // Random int 0-2 (inclusive)
+                gscales[x][y][z] = r;  // Assign random int to gscale index
+            }
 	}
     }
 }
@@ -54,14 +50,14 @@ void debug_rand()
     {
      	printf("-");
     }
-   
+
     printf("\nRandom greyscale values:");
     for (int x = 0; x < SIZE; x++)
     {
-        printf("\n");
-    	for (int y = 0; y < SIZE; y++)
+     	printf("\n");
+        for (int y = 0; y < SIZE; y++)
         {
-  	    printf("\n");
+            printf("\n");
             for (int z = 0; z < SIZE; z++)
             {
              	printf("%d ", gscales[x][y][z]);
@@ -79,27 +75,24 @@ void find_dist(int x1, int y1, int z1)
 {
     int lowestDist = SIZE;
 
-#   ifdef _OPENMP
-#   pragma omp parallel for default(none) shared(x1, y1, z1, lowestDist, gscales)
-#   endif
     for (int x2 = 0; x2 < SIZE; x2++)
     {
-        for (int y2 = 0; y2 < SIZE; y2++)
+	for (int y2 = 0; y2 < SIZE; y2++)
         {
             for (int z2 = 0; z2 < SIZE; z2++)
             {
-                if (gscales[x2][y2][z2] == 0)
-		{
-		    int tmpDist = euclid_dist(x1, y1, z1, x2, y2, z2);
-		    if (tmpDist < lowestDist)
-		    {
-			lowestDist = tmpDist;
-		    } 
-		}   
+             	if (gscales[x2][y2][z2] == 0)
+                {
+                    int tmpDist = euclid_dist(x1, y1, z1, x2, y2, z2);
+                    if (tmpDist < lowestDist)
+                    {
+                     	lowestDist = tmpDist;
+                    }
+                }
             }
 	}
     }
-    dist[x1][y1][z1] = lowestDist;     
+    dist[x1][y1][z1] = lowestDist;
 }
 
 // Finds the distance between two points
@@ -113,7 +106,7 @@ void debug_dist()
 {
     for (int i  = 0; i < SIZE * 2; i++)
     {
-    	printf("-");
+     	printf("-");
     }
 
     printf("\nDistance values:");
@@ -137,7 +130,8 @@ void debug_dist()
 int main(int argc, char *argv[])
 {
     FILE *file;
-    file = fopen("output.txt", "a+");
+
+    file = fopen("output.txt", "w");
 
     rand_gscales(); // Allocate random gscale values to array
 
@@ -148,46 +142,37 @@ int main(int argc, char *argv[])
 
     START_TIMER(findDist);
 
-#   ifdef _OPENMP
-#   pragma omp parallel for default(none) shared(gscales, dist)
-#   endif
     // Check for nonzero pixels
     for (int x = 0; x < SIZE; x++)
     {
-        for (int y = 0; y < SIZE; y++)
+     	for (int y = 0; y < SIZE; y++)
         {
             for (int z = 0; z < SIZE; z++)
             {
-		// If the pixel is a nonzero gscale value
-		// Find distance to closest pixel with zero gscale value
-             	if (gscales[x][y][z] != 0)
-		{
-		    find_dist(x, y, z);
-	        }
-		// If the pixel is a zero gscale value, set dist value to 0
-	 	else
-		{
-		    dist[x][y][z] = 0;
-	        }
+             	// If the pixel is a nonzero gscale value
+                // Find distance to closest pixel with zero gscale value
+                if (gscales[x][y][z] != 0)
+                {
+                    find_dist(x, y, z);
+                }
+                // If the pixel is a zero gscale value, set dist value to 0
+                else
+                {
+                    dist[x][y][z] = 0;
+                }
             }
 	}
     }
 
     STOP_TIMER(findDist);
 
-    int num_threads;
-#   ifdef _OPENMP
-    num_threads = omp_get_max_threads();
-#   else
-    num_threads = 1;
-#   endif
-
     #ifdef DEBUG
     debug_dist();
     #endif
 
-    fprintf(file, "DIST: %8.4fs for %d thread\n", GET_TIMER(findDist), num_threads);
+    fprintf(file, "DIST: %8.4fs for %d thread\n", GET_TIMER(findDist), 1);
 
     fclose(file);
     return EXIT_SUCCESS;
 }
+
