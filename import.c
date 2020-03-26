@@ -78,7 +78,9 @@ void printArray(char * array, uint32 width)
     
     for (i = 0; i < width; i++)
     {
-        printf("%d ", array[i] + 128);
+        // Have to convert to unsigned char or sign-extension will ruin high values
+        unsigned char c = (unsigned char) array[i];
+        printf("%d ", c);
         if (i % 512 == 0)
             printf("End of row %d", i / 512 - 1);
         if (i % 16 == 0)
