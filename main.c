@@ -15,7 +15,7 @@ void main()
 /* This .tiff file is essentially a stack of 2D images - this code tells us how many images
  * are in the stack.
  */
-    TIFF *tif = TIFFOpen("img100_1.tif", "r");
+    TIFF *tif = TIFFOpen("images/img100_1.tif", "r");
     if (tif) {
 	dircount = 0;
 	do {
