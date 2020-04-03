@@ -13,6 +13,9 @@ images/img100_1.tif
 images/import.c
 
 	Converts a tiff file into an array. In addition, it also does the reading-in of the file header for tiff files.
+pf
+	
+	This folder contains all of the files for calculating pixel distance
 
 pf/Makefile
 
