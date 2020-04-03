@@ -1,4 +1,5 @@
 SOURCE CODE: https://github.com/nickalbright97/BubbleSort
+DATA: tiff file in the image folder in the repo
 
 idlCode/code.txt: 
 	
