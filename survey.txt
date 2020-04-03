@@ -1,4 +1,4 @@
 1) 5
-2) Urgent
+2) Non-critical
 3) Great
 4) We do not have any questions right now because we have had many office hours sessions with you.
