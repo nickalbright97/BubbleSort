@@ -1,22 +1,27 @@
-int[][][] find_dist(int *g, int w, int h, int d)
+#include <stdio.h>
+#include <stdlib.h>
+#include "queue.h"
+
+char* find_dist(char *g, int w, int h, int d)
 {
-    int dist[w][h][d];
+    char *dist;
     struct queue *worker_queue;
     int width;
 
     worker_queue = (struct queue *)malloc(sizeof(struct queue));
     initqueue(worker_queue);
-    width = w * h * d;
+    width = w * h * d; 
+    dist = malloc(width); 
 
     for (int x = 0; x < w; x++)
     {
-        for (int y = 0; y < y; y++)
+        for (int y = 0; y < h; y++)
         {
             for (int z = 0; z < d; z++)
             {
-                if (indexArray(g, width, x, y, z) != 0)
+                if (getIndexArray(g, width, x, y, z) != 0)
                 {
-                    dist[x][y][z] = -1;
+		    setIndexArray(dist, width, x, y, z, -1);
                 }
                 else
                 {
@@ -35,35 +40,35 @@ int[][][] find_dist(int *g, int w, int h, int d)
             struct cell *c;
             c = dequeue(worker_queue);
 
-            if (c->x-1 > -1 && dist[c->x-1][c->y][c->z] == -1)
+            if (c->x-1 > -1 && getIndexArray(dist, width, c->x-1, c->y, c->z) == -1)
             {
-             	dist[c->x-1][c->y][c->z] = i;
-                enqueue(worker_queue, create_element(c->x-1, c->y, c->z, dist[c->x-1][c->y][c->z]));
+		setIndexArray(dist, width, c->x-1, c->y, c->z, i);
+                enqueue(worker_queue, create_element(c->x-1, c->y, c->z, getIndexArray(dist, width, c->x-1, c->y, c->z)));
             }
-            if (c->x+1 < w && dist[c->x+1][c->y][c->z] == -1)
+            if (c->x+1 < w && getIndexArray(dist, width, c->x+1, c->y, c->z) == -1)
             {
-             	dist[c->x+1][c->y][c->z] = i;
-                enqueue(worker_queue, create_element(c->x+1, c->y, c->z, dist[c->x+1][c->y][c->z]));
+		setIndexArray(dist, width, c->x+1, c->y, c->z, i);
+                enqueue(worker_queue, create_element(c->x+1, c->y, c->z, getIndexArray(dist, width, c->x+1, c->y, c->z)));
             }
-            if (c->y-1 > -1 && dist[c->x][c->y-1][c->z] == -1)
+            if (c->y-1 > -1 && getIndexArray(dist, width, c->x, c->y-1, c->z) == -1)
             {
-             	dist[c->x][c->y-1][c->z] = i;
-                enqueue(worker_queue, create_element(c->x, c->y-1, c->z, dist[c->x][c->y-1][c->z]));
+  		setIndexArray(dist, width, c->x, c->y-1, c->z, i);
+                enqueue(worker_queue, create_element(c->x, c->y-1, c->z, getIndexArray(dist, width, c->x, c->y-1, c->z)));
             }
-            if (c->y+1 < h && dist[c->x][c->y+1][c->z] == -1)
+            if (c->y+1 < h && getIndexArray(dist, width, c->x, c->y+1, c->z) == -1)
             {
-             	dist[c->x][c->y+1][c->z] = i;
-                enqueue(worker_queue, create_element(c->x, c->y+1, c->z, dist[c->x][c->y+1][c->z]));
+		setIndexArray(dist, width, c->x, c->y+1, c->z, i);
+                enqueue(worker_queue, create_element(c->x, c->y+1, c->z, getIndexArray(dist, width, c->x, c->y+1, c->z)));
             }
-            if (c->z-1 > -1 && dist[c->x][c->y][c->z-1] == -1)
+            if (c->z-1 > -1 && getIndexArray(dist, width, c->x, c->y, c->z-1) == -1)
             {
-             	dist[c->x][c->y][c->z-1] = i;
-                enqueue(worker_queue, create_element(c->x, c->y, c->z-1, dist[c->x][c->y][c->z-1]));
+	 	setIndexArray(dist, width, c->x, c->y, c->z-1, i);
+                enqueue(worker_queue, create_element(c->x, c->y, c->z-1, getIndexArray(dist, width, c->x, c->y, c->z-1)));
             }
-            if (c->z+1 < d && dist[c->x][c->y][c->z+1] == -1)
+            if (c->z+1 < d && getIndexArray(dist, width, c->x, c->y, c->z+1) == -1)
             {
-             	dist[c->x][c->y][c->z+1] = i;
-                enqueue(worker_queue, create_element(c->x, c->y, c->z+1, dist[c->x][c->y][c->z+1]));
+		setIndexArray(dist, width, c->x, c->y, c->z+1, i);
+                enqueue(worker_queue, create_element(c->x, c->y, c->z+1, getIndexArray(dist, width, c->x, c->y, c->z+1)));
             }
 
             free(c);
