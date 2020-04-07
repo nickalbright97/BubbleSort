@@ -60,7 +60,7 @@ void main()
         }
 
         // printArray(buf, buffsize);
-        printf("%d\n", indexArray(buf, buffsize, 4, 511, 0));
+        // printf("%d\n", indexArray(buf, buffsize, 4, 511, 0));
 	
         free(buf);
         TIFFClose(tif);
