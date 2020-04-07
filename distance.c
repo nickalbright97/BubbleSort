@@ -1,6 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "tiffio.h"
+#include <string.h>
 #include "queue.h"
+
+int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
+void setIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i, int val);
+int whiteThreshold = 50; // defines white
+
 
 char* find_dist(char *g, int w, int h, int d)
 {
@@ -19,7 +26,7 @@ char* find_dist(char *g, int w, int h, int d)
         {
             for (int z = 0; z < d; z++)
             {
-                if (getIndexArray(g, width, x, y, z) != 0)
+                if (getIndexArray(g, width, x, y, z) < whiteThreshold)
                 {
 		    setIndexArray(dist, width, x, y, z, -1);
                 }

@@ -7,6 +7,7 @@ uint32 w, h, z, buffsize; // global variables
 
 void printArray(char * array, uint32 width);
 int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
+char * find_dist(char *g, int w, int h, int z);
 
 void main()
 {
@@ -59,9 +60,14 @@ void main()
             }
         }
 
-        // printArray(buf, buffsize);
+	// allocate memory for distance buffer
+	unsigned char *distBuf = malloc(w * h * z);
+        distBuf = find_dist(buf, w, h, z);
+
+        printArray(distBuf, buffsize);
         // printf("%d\n", indexArray(buf, buffsize, 4, 511, 0));
-	
+
+	free(distBuf);	
         free(buf);
         TIFFClose(tif);
     }
