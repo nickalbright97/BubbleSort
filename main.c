@@ -8,6 +8,7 @@ uint32 w, h, z, buffsize; // global variables
 void printArray(char * array, uint32 width);
 int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
 char * find_dist(char *g, int w, int h, int z);
+void makeCSVs(char * array);
 
 void main()
 {
@@ -60,6 +61,9 @@ void main()
             }
         }
 
+        // makeCSVs(buf);
+        
+        
 	// allocate memory for distance buffer
 	unsigned char *distBuf = malloc(w * h * z);
         distBuf = find_dist(buf, w, h, z);
@@ -68,6 +72,7 @@ void main()
         // printf("%d\n", indexArray(buf, buffsize, 4, 511, 0));
 
 	free(distBuf);	
+        
         free(buf);
         TIFFClose(tif);
     }
@@ -89,6 +94,36 @@ void setIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i, int va
     if (x_i * y_i * z_i > width) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     array[z_i*w*h + y_i * w + x_i + 1] = val;
+}
+
+void makeCSVs(char * array) {
+    FILE *fp;
+    char index[10];
+
+    for (int z_i = 0; z_i < z; z_i++) {
+        char *filename;
+        snprintf(filename, 20, "CSVs/arr%d.csv", z_i);
+        fp = fopen(filename, "w+");
+        
+        for (int i = 0; i < w*h; i++) {
+            if (i % 512 == 0 && i != 0) { fprintf(fp, "\n"); }
+            unsigned char c = (unsigned char) array[z_i*w*h + i];
+            if ((i+1) % 512 == 0) {
+                fprintf(fp, "%d", c);
+            } else {
+                fprintf(fp, "%d,", c);
+            }
+            /*
+            for (int j = 0; j < 100; j++) {
+                printf("%d\n",j);
+              //  c = (unsigned char) array[z_i*w*h + y*w + x + 1];
+                fprintf(fp, ",%d", 1);
+            } 
+            */
+            
+        }
+        fclose(fp);
+    }
 }
 
 void printArray(char * array, uint32 width)

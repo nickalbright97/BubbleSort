@@ -6,7 +6,7 @@
 
 int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
 void setIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i, int val);
-int whiteThreshold = 50; // defines white
+int whiteThreshold = 190; // defines white
 
 
 char* find_dist(char *g, int w, int h, int d)
