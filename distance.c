@@ -4,6 +4,7 @@
 #include <string.h>
 #include "queue.h"
 
+int getDistIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
 int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
 void setIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i, int val);
 int whiteThreshold = 190; // defines white
@@ -47,35 +48,35 @@ char* find_dist(char *g, int w, int h, int d)
             struct cell *c;
             c = dequeue(worker_queue);
 
-            if (c->x-1 > -1 && getIndexArray(dist, width, c->x-1, c->y, c->z) == -1)
+            if (c->x-1 > -1 && getDistIndexArray(dist, width, c->x-1, c->y, c->z) == -1)
             {
 		setIndexArray(dist, width, c->x-1, c->y, c->z, i);
-                enqueue(worker_queue, create_element(c->x-1, c->y, c->z, getIndexArray(dist, width, c->x-1, c->y, c->z)));
+                enqueue(worker_queue, create_element(c->x-1, c->y, c->z, getDistIndexArray(dist, width, c->x-1, c->y, c->z)));
             }
-            if (c->x+1 < w && getIndexArray(dist, width, c->x+1, c->y, c->z) == -1)
+            if (c->x+1 < w && getDistIndexArray(dist, width, c->x+1, c->y, c->z) == -1)
             {
 		setIndexArray(dist, width, c->x+1, c->y, c->z, i);
-                enqueue(worker_queue, create_element(c->x+1, c->y, c->z, getIndexArray(dist, width, c->x+1, c->y, c->z)));
+                enqueue(worker_queue, create_element(c->x+1, c->y, c->z, getDistIndexArray(dist, width, c->x+1, c->y, c->z)));
             }
-            if (c->y-1 > -1 && getIndexArray(dist, width, c->x, c->y-1, c->z) == -1)
+            if (c->y-1 > -1 && getDistIndexArray(dist, width, c->x, c->y-1, c->z) == -1)
             {
   		setIndexArray(dist, width, c->x, c->y-1, c->z, i);
-                enqueue(worker_queue, create_element(c->x, c->y-1, c->z, getIndexArray(dist, width, c->x, c->y-1, c->z)));
+                enqueue(worker_queue, create_element(c->x, c->y-1, c->z, getDistIndexArray(dist, width, c->x, c->y-1, c->z)));
             }
-            if (c->y+1 < h && getIndexArray(dist, width, c->x, c->y+1, c->z) == -1)
+            if (c->y+1 < h && getDistIndexArray(dist, width, c->x, c->y+1, c->z) == -1)
             {
 		setIndexArray(dist, width, c->x, c->y+1, c->z, i);
-                enqueue(worker_queue, create_element(c->x, c->y+1, c->z, getIndexArray(dist, width, c->x, c->y+1, c->z)));
+                enqueue(worker_queue, create_element(c->x, c->y+1, c->z, getDistIndexArray(dist, width, c->x, c->y+1, c->z)));
             }
-            if (c->z-1 > -1 && getIndexArray(dist, width, c->x, c->y, c->z-1) == -1)
+            if (c->z-1 > -1 && getDistIndexArray(dist, width, c->x, c->y, c->z-1) == -1)
             {
 	 	setIndexArray(dist, width, c->x, c->y, c->z-1, i);
-                enqueue(worker_queue, create_element(c->x, c->y, c->z-1, getIndexArray(dist, width, c->x, c->y, c->z-1)));
+                enqueue(worker_queue, create_element(c->x, c->y, c->z-1, getDistIndexArray(dist, width, c->x, c->y, c->z-1)));
             }
-            if (c->z+1 < d && getIndexArray(dist, width, c->x, c->y, c->z+1) == -1)
+            if (c->z+1 < d && getDistIndexArray(dist, width, c->x, c->y, c->z+1) == -1)
             {
 		setIndexArray(dist, width, c->x, c->y, c->z+1, i);
-                enqueue(worker_queue, create_element(c->x, c->y, c->z+1, getIndexArray(dist, width, c->x, c->y, c->z+1)));
+                enqueue(worker_queue, create_element(c->x, c->y, c->z+1, getDistIndexArray(dist, width, c->x, c->y, c->z+1)));
             }
 
             free(c);
