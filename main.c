@@ -61,9 +61,9 @@ void main()
             }
         }
 
-        // makeCSVs(buf);
+        makeCSVs(buf);
         
-        
+        /*
 	// allocate memory for distance buffer
 	unsigned char *distBuf = malloc(w * h * z);
         distBuf = find_dist(buf, w, h, z);
@@ -72,6 +72,7 @@ void main()
         // printf("%d\n", indexArray(buf, buffsize, 4, 511, 0));
 
 	free(distBuf);	
+        */
         
         free(buf);
         TIFFClose(tif);
