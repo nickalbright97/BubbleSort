@@ -6,7 +6,10 @@
 uint32 w, h, z, buffsize; // global variables
 
 void printArray(char * array, uint32 width);
+void printDistArray(char * array, uint32 width);
 int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
+int getDistIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
+void setIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i, int val);
 char * find_dist(char *g, int w, int h, int z);
 void makeCSVs(char * array);
 
@@ -63,16 +66,16 @@ void main()
 
         makeCSVs(buf);
         
-        /*
+        
 	// allocate memory for distance buffer
-	unsigned char *distBuf = malloc(w * h * z);
+	char *distBuf = malloc(w * h * z);
         distBuf = find_dist(buf, w, h, z);
 
-        printArray(distBuf, buffsize);
+        printDistArray(distBuf, buffsize);
         // printf("%d\n", indexArray(buf, buffsize, 4, 511, 0));
 
 	free(distBuf);	
-        */
+        
         
         free(buf);
         TIFFClose(tif);
@@ -86,6 +89,15 @@ int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i)
     if (x_i * y_i * z_i > width) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     unsigned char c = (unsigned char) array[z_i*w*h + y_i * w + x_i + 1]; 
+    return c; // casting unsigned char to int in return ensures positive val
+}
+
+// Index array given x, y, and z indices, return unsigned char
+int getDistIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i)
+{
+    if (x_i * y_i * z_i > width) { printf("ERROR: index > buffer length\n"); exit(-1); }
+
+    char c = array[z_i*w*h + y_i * w + x_i + 1];
     return c; // casting unsigned char to int in return ensures positive val
 }
 
@@ -151,5 +163,32 @@ void printArray(char * array, uint32 width)
     }
     */
     
+
+}
+
+void printDistArray(char * array, uint32 width)
+{
+    uint32 i;
+
+    for (i = 0; i < width/279; i++)
+    {
+     	// Have to convert to unsigned char or sign-extension will ruin high values
+        char c = array[i];
+        printf("%d ", c);
+        if (i % 512 == 0)
+            printf("End of row %d", i / 512 - 1);
+        if (i % 16 == 0)
+            printf("\n");
+    }
+    printf("\n");
+
+    /*
+    //  Use this to print a single pixel from each slice (offset is added to array index)
+    for (i = 0; i < 279; i++) {
+        char c = array[i*512*512 + 512*5 + 486];
+        printf("%d\n", c);
+    }
+    */
+
 
 }
