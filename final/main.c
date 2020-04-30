@@ -1,5 +1,4 @@
 #include "tiffio.h"
-#include "index.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
