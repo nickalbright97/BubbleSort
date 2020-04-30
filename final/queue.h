@@ -1,3 +1,5 @@
+#include <stdlib.h>
+
 /*
     Represents a pixel with x, y, and z values as well
     as a greyscale value. Also a node in a linked list.
