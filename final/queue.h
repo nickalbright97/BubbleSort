@@ -1,3 +1,7 @@
+/*
+    Represents a pixel with x, y, and z values as well
+    as a greyscale value. Also a node in a linked list.
+ */
 struct cell {
     struct cell *next; // next node in a linked list
     int x;
@@ -6,12 +10,20 @@ struct cell {
     int value;
 };
 
+/*
+    A queue with the pixel values which are represented
+    by the cell struct.
+ */
 struct queue { // struct for a queue
     struct cell *head;
     struct cell *tail;
     int size;
 };
 
+/*
+    Creates an element that is a cell with the corresponding
+    x, y, and z values as well as a greyscale value.
+ */
 struct cell *create_element(int x, int y, int z, int value) {
     struct cell *tmp;
     tmp = (struct cell *)malloc(sizeof(struct cell));
@@ -104,6 +116,9 @@ struct cell *dequeue(struct queue *q) {
     return ret; // return the value
 }
 
+/*
+    Returns true if the queue is empty.
+ */
 int isempty(struct queue *q) {
     return (q->head == NULL);
 }
