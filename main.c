@@ -123,7 +123,7 @@ void main()
             zi++;
         }
         printf("bubbles: \n");
-        for (int i = 0; i < 4000; i++) {
+        for (int i = 0; i < sizeof(xyzr); i++) {
             if (i % 4 == 0) {
                 printf("\n");
             }
@@ -131,7 +131,17 @@ void main()
         }
         printf("\n");
 
-	
+        /*int count = 0;
+	for (int x = 0; x < width; x++) {
+	    for (int y = 0; y < height; y++) {
+		for (int z = 0; z < depth; z++) {
+		    int tmp = getDistIndexArray(distBuf, buffsize, x, y, z);
+		    if (tmp == 127) count++;
+		}
+	    }
+	}
+	printf("count: %d: \n", count);*/
+
 	free(buf);	
         free(distBuf);
 	free(xyzr);
