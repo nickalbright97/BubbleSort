@@ -1,6 +1,5 @@
 #include "tiffio.h"
 #include "index.h"
-#include "debug.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,7 +11,7 @@ void printDistArray(char * array, uint32 width);
 int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
 int getDistIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
 void setIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i, int val);
-//char * find_dist(char *g, int w, int h, int z);
+char * find_dist(char *g, int w, int h, int z);
 void makeCSVs(char * array);
 
 void main()
