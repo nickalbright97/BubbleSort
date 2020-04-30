@@ -99,7 +99,7 @@ void main()
                     dist = 0;
                     
                     #   ifdef _OPENMP
-                    #   pragma omp parallel for default(none) shared(x_slice, y_slice, dist, z_slice, xi, yi, zi, x, y, z)
+                    #   pragma omp parallel for default(none) shared(x_slice, y_slice, dist, distBuff, buffsize, z_slice, xi, yi, zi)
                     #   endif
                     for (int z = zi * z_slice; z < (zi + 1) * z_slice; z++) { // each for loop iterates through each cell in each x,y,z slice
                         for (int y = yi * y_slice; y < (yi + 1) * y_slice; y++) {
