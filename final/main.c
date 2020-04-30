@@ -65,10 +65,7 @@ int main(int argc, char *argv[])
                 rows_in_strip * npixels);
         }
     }
-
-    
-    //makeCSVs(buf);
-            
+ 
     // allocate memory for distance buffer
     char *distBuf = malloc(width * height * depth);
     distBuf = find_dist(buf, width, height, depth);
