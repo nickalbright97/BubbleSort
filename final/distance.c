@@ -5,11 +5,11 @@
 #include "queue.h"
 
 int getDistIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
-int getIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i);
+int getIndexArray(unsigned char * array, uint32 width, int x_i, int y_i, int z_i);
 void setIndexArray(char * array, uint32 width, int x_i, int y_i, int z_i, int val);
 int whiteThreshold = 190; // defines white
 
-char* find_dist(char *g, int w, int h, int d)
+char* find_dist(unsigned char *g, int w, int h, int d)
 {
     char *dist;
     struct queue *worker_queue;
