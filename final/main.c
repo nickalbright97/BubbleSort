@@ -13,7 +13,7 @@ char *find_dist(unsigned char *g, int w, int h, int z);
 
 int main(int argc, char *argv[])
 {
-   START_TIMER(main);
+   START_TIMER(tiff);
 
    int dircount;
 
@@ -68,16 +68,21 @@ int main(int argc, char *argv[])
         }
     }
  
+    STOP_TIMER(tiff);
+    START_TIMER(dist);
+
     // allocate memory for distance buffer
     char *distBuf = malloc(width * height * depth);
     distBuf = find_dist(buf, width, height, depth);
+
+    STOP_TIMER(dist);
 
     free(buf);	
     free(distBuf);
     TIFFClose(tif);
 
-    STOP_TIMER(main);
-    printf("MAIN: %8.4fs\n", GET_TIMER(main));
+    printf("TIFF: %8.4fs\n", GET_TIMER(tiff));
+    printf("DIST: %8.4fs\n", GET_TIMER(dist));
 
     return EXIT_SUCCESS;
 }

@@ -1,0 +1,4 @@
+279 directories in images/img100_1.tif
+TIFF width: 512
+TIFF height: 512
+TIFF config: 1
