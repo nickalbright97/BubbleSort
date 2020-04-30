@@ -1,49 +1,41 @@
 SOURCE CODE: https://github.com/nickalbright97/BubbleSort
 DATA: tiff file in the image folder in the repo
 
-idlCode/code.txt: 
-	
-	Program that our C code is based off of. Our goal was to convert this code to C code and parallelize it 
-to get the run time (which would take several days for multiple images from a tiff file) to be faster.
-
-images/img100_1.tif
+final/images/img100-1.tif
 
 	A sample image of a tiff file of what our code will process.
 
-images/import.c
-
-	Converts a tiff file into an array. In addition, it also does the reading-in of the file header for tiff files.
-pf
+final/Makefile
 	
-	This folder contains all of the files for calculating pixel distance
+	Compiles and cleans main.c, par_main.c, and distance.c
 
-pf/Makefile
+final/distance.c
 
-	Compiles and cleans pf.c and pf_serial.c.
+	Calculates the distance between pixels
 
-pf/output.txt
+final/main.c
 
-	Displays the runtime of a program.
+	Converts a tiff file into an array. It is also able to output other meaningful information, such as the current 		directory being processed and the number of directories (images) in a tiff stack.
 
-pf/queue.h
+final/output.txt
 
-	A queue for cells representing pixels of an image. Values in the nodes have x, y, and z coordinates as well as a value representing a pixel value in grayscale. The queue has associated enqueue and dequeue functions as well as functions to intialize a queue and determine if it is empty. 
+	Contains the number of directories and information of the height, width, and config.
 
-pf/test.sh
+final/par_main.c
 
-	Test script that runs the pf_serial.c on one thread and pf.c on multiple threads.
+	Parallel version of main.c. Parallelized using OpenMP
 
-pf/timer.h
+final/queue.h
+
+	A queue for cells representing pixels of an image. Values in the nodes have x, y, and z coordinates as well as a 	value representing a pixel value in grayscale. The queue has associated enqueue and dequeue functions as well as 	functions to intialize a queue and determine if it is empty.
+
+final/test.sh
+
+	 Test script that runs the main.c on one thread and par_main.c on multiple threads.
+
+final/timer.h
 
 	Timer to test the runtime of a program.
-
-Makefile
-
-	Compiles main.c
-
-Main.c
-
-	Converts a tiff file into an array. It is also able to output other meaningful information, such as the current directory being processed and the number of directories (images) in a tiff stack.
 
 
 
