@@ -2,6 +2,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "timer.h"
+
+#ifdef _OPENMP
+#include <omp.h>
+#define NTHREADS omp_get_max_threads()
+#else
+#define NTHREADS 1
+#endif
 
 uint32 width, height, depth, buffsize; // global variables
 
@@ -15,6 +23,7 @@ void makeCSVs(char * array);
 
 void main()
 {
+   START_TIMER(init);
    int dircount;
 
 /* This .tiff file is essentially a stack of 2D images - this code tells us how many images
@@ -28,7 +37,7 @@ void main()
 //          Enable line below to see directory info - very useful
 //          TIFFPrintDirectory(tif, stdout, 0);
 	} while (TIFFReadDirectory(tif));
-	printf("%d directories in %s\n", dircount, "img100_1");
+	//printf("%d directories in %s\n", dircount, "img100_1");
     }
 
     if (tif) {
@@ -41,9 +50,9 @@ void main()
 	    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
         TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
         depth = dircount;
-        printf("TIFF width: %d\n", width);
-        printf("TIFF height: %d\n", height);
-        printf("TIFF config: %d\n", config);
+        //printf("TIFF width: %d\n", width);
+        //printf("TIFF height: %d\n", height);
+        //printf("TIFF config: %d\n", config);
         // Initialize buffer using w * h * z        
         unsigned char *buf = malloc(width * height * depth); // buffer to store all image pixels
 	    npixels = width * height;
@@ -79,7 +88,7 @@ void main()
         int x_slice = width / 10;
         int y_slice = height / 10;
         int z_slice = depth / 10;
-        printf("x: %d, y: %d, z: %d\n", x_slice, y_slice, z_slice);
+        //printf("x: %d, y: %d, z: %d\n", x_slice, y_slice, z_slice);
         
         // initialize buffer for xyzr output
         int *xyzr = malloc(x_slice * y_slice * z_slice * 4);
@@ -92,6 +101,7 @@ void main()
         int xi, yi, zi = 0; // slice indices
         int x, y, z = 0; // array indices
 
+        //for (int tempz = (zi + 1) * z_slice; tempz < depth;) 
         while ((zi + 1 )* z_slice < depth) { // each while loop ensures slices dont outpace total array size
             while ((yi + 1) * y_slice < height) {
                 while ((xi + 1) * x_slice < width) {
@@ -127,14 +137,14 @@ void main()
             yi = 0;
             zi++;
         }
-        printf("bubbles: \n");
-        for (int i = 0; i < 4000; i++) {
-            if (i % 4 == 0) {
-                printf("\n");
-            }
-            printf("%d,", xyzr[i]);
-        }
-        printf("\n");
+        //printf("bubbles: \n");
+        //for (int i = 0; i < 4000; i++) {
+        //    if (i % 4 == 0) {
+        //        printf("\n");
+        //    }
+        //    printf("%d,", xyzr[i]);
+        //}
+        //printf("\n");
 
 	
 	free(buf);	
@@ -142,13 +152,16 @@ void main()
 	free(xyzr);
         TIFFClose(tif);
     }
+    
+    STOP_TIMER(init);
+    printf("Nthreads=%2d    Time:=%2d", NTHREADS, GET_TIMER(init));
     exit(0);
 }
 
 // Index array given x, y, and z indices, return unsigned char
 int getIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 {
-    if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
+    //if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     unsigned char c = (unsigned char) array[z_i*width*height + y_i * width + x_i + 1]; 
     return c; // casting unsigned char to int in return ensures positive val
@@ -157,7 +170,7 @@ int getIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 // Index array given x, y, and z indices, return unsigned char
 int getDistIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 {
-    if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
+    //if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     char c = array[z_i*width*height + y_i * width + x_i + 1];
     return c;
@@ -166,7 +179,7 @@ int getDistIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 // Index array given x, y, and z indices, return unsigned char
 void setIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i, int val)
 {
-    if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
+    //if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     array[z_i*width*height + y_i * width + x_i + 1] = val;
 }
@@ -209,13 +222,13 @@ void printArray(char * array, uint32 maxSize)
     {
         // Have to convert to unsigned char or sign-extension will ruin high values
         unsigned char c = (unsigned char) array[i];
-        printf("%d ", c);
-        if (i % width == 0)
-            printf("End of row %d", i / width - 1);
-        if (i % 16 == 0)
-            printf("\n"); 
+        //printf("%d ", c);
+        //if (i % width == 0)
+        //    printf("End of row %d", i / width - 1);
+        //if (i % 16 == 0)
+        //    printf("\n"); 
     }
-    printf("\n");
+    //printf("\n");
 
     /*    
     //  Use this to print a single pixel from each slice (offset is added to array index)
@@ -236,13 +249,13 @@ void printDistArray(char * array, uint32 maxSize)
     {
      	// Have to convert to unsigned char or sign-extension will ruin high values
         char c = array[i];
-        printf("%d ", c);
-        if (i % width == 0)
-            printf("End of row %d", i / width - 1);
-        if (i % 16 == 0)
-            printf("\n");
+        //printf("%d ", c);
+        //if (i % width == 0)
+        //    printf("End of row %d", i / width - 1);
+        //if (i % 16 == 0)
+        //    printf("\n");
     }
-    printf("\n");
+    //printf("\n");
 
     /*
     //  Use this to print a single pixel from each slice (offset is added to array index)

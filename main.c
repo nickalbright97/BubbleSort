@@ -28,7 +28,7 @@ void main()
 //          Enable line below to see directory info - very useful
 //          TIFFPrintDirectory(tif, stdout, 0);
 	} while (TIFFReadDirectory(tif));
-	printf("%d directories in %s\n", dircount, "img100_1");
+	//printf("%d directories in %s\n", dircount, "img100_1");
     }
 
     if (tif) {
@@ -41,9 +41,9 @@ void main()
 	    TIFFGetField(tif, TIFFTAG_IMAGELENGTH, &height);
         TIFFGetField(tif, TIFFTAG_PLANARCONFIG, &config);
         depth = dircount;
-        printf("TIFF width: %d\n", width);
-        printf("TIFF height: %d\n", height);
-        printf("TIFF config: %d\n", config);
+        //printf("TIFF width: %d\n", width);
+        //printf("TIFF height: %d\n", height);
+        //printf("TIFF config: %d\n", config);
         // Initialize buffer using w * h * z        
         unsigned char *buf = malloc(width * height * depth); // buffer to store all image pixels
 	npixels = width * height;
@@ -79,7 +79,7 @@ void main()
         int x_slice = width / 10;
         int y_slice = height / 10;
         int z_slice = depth / 10;
-        printf("x: %d, y: %d, z: %d\n", x_slice, y_slice, z_slice);
+        //printf("x: %d, y: %d, z: %d\n", x_slice, y_slice, z_slice);
         
         // initialize buffer for xyzr output
         int *xyzr = malloc(x_slice * y_slice * z_slice * 4);
@@ -122,6 +122,7 @@ void main()
             yi = 0;
             zi++;
         }
+        /*
         printf("bubbles: \n");
         for (int i = 0; i < sizeof(xyzr); i++) {
             if (i % 4 == 0) {
@@ -130,6 +131,7 @@ void main()
             printf("%d,", xyzr[i]);
         }
         printf("\n");
+        */
 
         /*int count = 0;
 	for (int x = 0; x < width; x++) {
@@ -153,7 +155,7 @@ void main()
 // Index array given x, y, and z indices, return unsigned char
 int getIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 {
-    if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
+    //if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     unsigned char c = (unsigned char) array[z_i*width*height + y_i * width + x_i + 1]; 
     return c; // casting unsigned char to int in return ensures positive val
@@ -162,7 +164,7 @@ int getIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 // Index array given x, y, and z indices, return unsigned char
 int getDistIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 {
-    if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
+    //if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     char c = array[z_i*width*height + y_i * width + x_i + 1];
     return c;
@@ -171,7 +173,7 @@ int getDistIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i)
 // Index array given x, y, and z indices, return unsigned char
 void setIndexArray(char * array, uint32 maxSize, int x_i, int y_i, int z_i, int val)
 {
-    if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
+    //if (x_i * y_i * z_i > maxSize) { printf("ERROR: index > buffer length\n"); exit(-1); }
 
     array[z_i*width*height + y_i * width + x_i + 1] = val;
 }
@@ -214,13 +216,13 @@ void printArray(char * array, uint32 maxSize)
     {
         // Have to convert to unsigned char or sign-extension will ruin high values
         unsigned char c = (unsigned char) array[i];
-        printf("%d ", c);
-        if (i % width == 0)
-            printf("End of row %d", i / width - 1);
-        if (i % 16 == 0)
-            printf("\n"); 
+        //printf("%d ", c);
+        //if (i % width == 0)
+        //    printf("End of row %d", i / width - 1);
+        //if (i % 16 == 0)
+        //    printf("\n"); 
     }
-    printf("\n");
+    //printf("\n");
 
     /*    
     //  Use this to print a single pixel from each slice (offset is added to array index)
@@ -241,13 +243,13 @@ void printDistArray(char * array, uint32 maxSize)
     {
      	// Have to convert to unsigned char or sign-extension will ruin high values
         char c = array[i];
-        printf("%d ", c);
-        if (i % width == 0)
-            printf("End of row %d", i / width - 1);
-        if (i % 16 == 0)
-            printf("\n");
+        //printf("%d ", c);
+        //if (i % width == 0)
+        //    printf("End of row %d", i / width - 1);
+        //if (i % 16 == 0)
+        //    printf("\n");
     }
-    printf("\n");
+    //printf("\n");
 
     /*
     //  Use this to print a single pixel from each slice (offset is added to array index)
